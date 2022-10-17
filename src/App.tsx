@@ -1,20 +1,28 @@
-import { useState, useEffect } from 'react';
-import './App.css';
+import { useState, useEffect, ChangeEvent } from 'react';
 import CardList from './components/card-list/card-list.component';
 import SearchBox from './components/search-box/search-box.component';
+import { getData } from './components/utils/data.utils';
+import './App.css';
+
+export type Monster = {
+  id: string;
+  name: string;
+  email: string;
+}
 
 const App = () => {
-
   const [searchField, setSearchField] = useState(''); // pass in empty string at the start as searchField and use setSearchField as the updated variable
-  const [ monsters, setMonsters ] = useState([]);
+  const [ monsters, setMonsters ] = useState<Monster[]>([]);
 
   useEffect(() => {
-    fetch('https://jsonplaceholder.typicode.com/users') // fetching json date from url and populating it into the monsters array
-    .then((response) => response.json())
-    .then((users) => setMonsters(users));
+    const fetchUsers = async () => {
+      const users = await getData<Monster[]>('https://jsonplaceholder.typicode.com/users');
+      setMonsters(users);
+    };
+    fetchUsers();
   }, []); // pass in empty array as a dependency so it doesn't re-render
 
-  const onSearchChange = (event) => {
+  const onSearchChange = (event: ChangeEvent<HTMLInputElement>): void => {
     const searchFieldString = event.target.value.toLocaleLowerCase(); // getting and setting the lowercase version of the input box string
     setSearchField(searchFieldString);
   };
